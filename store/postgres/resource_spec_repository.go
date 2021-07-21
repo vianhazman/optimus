@@ -38,8 +38,8 @@ type Resource struct {
 	DeletedAt *time.Time
 }
 
+// serialize resource spec without assets to one of the datastore provided wire format
 func (r Resource) FromSpec(resourceSpec models.ResourceSpec) (Resource, error) {
-	// serialize resource spec without assets to one of the datastore provided wire format
 	binaryReadySpec := resourceSpec
 	binaryReadySpec.Assets = nil
 	controller, ok := resourceSpec.Datastore.Types()[resourceSpec.Type]
@@ -48,7 +48,7 @@ func (r Resource) FromSpec(resourceSpec models.ResourceSpec) (Resource, error) {
 	}
 	serializedSpec, err := controller.Adapter().ToYaml(binaryReadySpec)
 	if err != nil {
-		return Resource{}, err
+		return Resource{}, errors.Wrapf(err, "controller.Adapter().ToYaml: %v", binaryReadySpec)
 	}
 
 	assetBytes, err := json.Marshal(resourceSpec.Assets)
@@ -75,7 +75,7 @@ func (r Resource) FromSpec(resourceSpec models.ResourceSpec) (Resource, error) {
 func (r Resource) FromSpecWithNamespace(resourceSpec models.ResourceSpec, namespace models.NamespaceSpec) (Resource, error) {
 	adaptResource, err := r.FromSpec(resourceSpec)
 	if err != nil {
-		return Resource{}, err
+		return Resource{}, errors.Wrapf(err, "resource: %v", resourceSpec)
 	}
 
 	// namespace
@@ -107,7 +107,7 @@ func (r Resource) ToSpec(ds models.Datastorer) (models.ResourceSpec, error) {
 	}
 	deserializedSpec, err := controller.Adapter().FromYaml(r.Spec)
 	if err != nil {
-		return models.ResourceSpec{}, err
+		return models.ResourceSpec{}, errors.Wrapf(err, "controller.Adapter().FromYaml: %v", r.Spec)
 	}
 
 	var assets map[string]string

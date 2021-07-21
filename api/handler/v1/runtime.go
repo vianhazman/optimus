@@ -630,11 +630,11 @@ func (sv *RuntimeServiceServer) CreateResource(ctx context.Context, req *pb.Crea
 
 	optResource, err := sv.adapter.FromResourceProto(req.Resource, req.DatastoreName)
 	if err != nil {
-		return nil, status.Errorf(codes.Internal, "%s: failed to parse resource %s", err.Error(), req.Resource.GetName())
+		return nil, status.Errorf(codes.Internal, "%s: failed to parse resource %v", err.Error(), req.Resource)
 	}
 
 	if err := sv.resourceSvc.CreateResource(ctx, namespaceSpec, []models.ResourceSpec{optResource}, sv.progressObserver); err != nil {
-		return nil, status.Errorf(codes.Internal, "%s: failed to create resource %s", err.Error(), req.Resource.GetName())
+		return nil, status.Errorf(codes.Internal, "%s: failed to create resource %v", err.Error(), optResource)
 	}
 	return &pb.CreateResourceResponse{
 		Success: true,
@@ -656,11 +656,11 @@ func (sv *RuntimeServiceServer) UpdateResource(ctx context.Context, req *pb.Upda
 
 	optResource, err := sv.adapter.FromResourceProto(req.Resource, req.DatastoreName)
 	if err != nil {
-		return nil, status.Errorf(codes.Internal, "%s: failed to parse resource %s", err.Error(), req.Resource.GetName())
+		return nil, status.Errorf(codes.Internal, "%s: failed to parse resource %v", err.Error(), req.Resource)
 	}
 
 	if err := sv.resourceSvc.UpdateResource(ctx, namespaceSpec, []models.ResourceSpec{optResource}, sv.progressObserver); err != nil {
-		return nil, status.Errorf(codes.Internal, "%s: failed to create resource %s", err.Error(), req.Resource.GetName())
+		return nil, status.Errorf(codes.Internal, "%s: failed to create resource %v", err.Error(), optResource)
 	}
 	return &pb.UpdateResourceResponse{
 		Success: true,
